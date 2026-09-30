@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SubSentry | Subscription Tracker</title>
+<style>
+:root{--bg:#0b1020;--panel:#141b30;--panel2:#1a2340;--text:#f4f6ff;--muted:#9aa6c5;--accent:#8b7cff;--cyan:#54d6c8;--orange:#ffbf69;--red:#ff7188;--line:#293452}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#202957 0,transparent 35%),var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text)}
+.wrap{max-width:1150px;margin:auto;padding:28px 20px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:28px}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--cyan));display:grid;place-items:center;font-size:24px;font-weight:900;color:#081020}
+h1{font-size:25px;margin:0} .subtitle{color:var(--muted);margin:6px 0 0;font-size:14px}
+button,.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;background:var(--accent);color:white;transition:.2s}button:hover,.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}.btn.secondary{background:#263252;color:#e8ecff;border:1px solid #354365}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:22px}.stat,.panel{background:linear-gradient(145deg,var(--panel),#11182b);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 10px 35px #0002}
+.stat-label{color:var(--muted);font-size:13px}.stat-value{font-size:28px;font-weight:800;margin:10px 0 4px}.stat-note{font-size:12px;color:var(--muted)}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}.panel h2{font-size:18px;margin:0 0 16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.list{display:grid;gap:11px}.sub{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;background:var(--panel2);border:1px solid #2a3658;border-radius:14px}
+.sub-left{display:flex;align-items:center;gap:12px;min-width:0}.service-icon{width:43px;height:43px;flex:0 0 43px;border-radius:13px;background:#293452;display:grid;place-items:center;font-size:20px}.sub h3{margin:0 0 5px;font-size:15px}.sub p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}.price{text-align:right;font-weight:800;white-space:nowrap}.price small{display:block;font-weight:400;color:var(--muted);font-size:11px;margin-top:4px}
+.badge{display:inline-block;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:700;background:#273557;color:#cbd4f6}.badge.soon{background:#49351f;color:var(--orange)}.badge.today{background:#4b2432;color:#ff9aad}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}label{font-size:12px;color:var(--muted)}input,select{width:100%;padding:12px;background:#0e1528;border:1px solid #344160;border-radius:11px;color:var(--text);outline:none}input:focus,select:focus{border-color:var(--accent)}
+.form-actions{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap}.empty{color:var(--muted);font-size:14px;padding:20px;text-align:center;border:1px dashed #344160;border-radius:12px}
+.reminder{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line)}.reminder:last-child{border:0}.datebox{min-width:54px;text-align:center;border-radius:12px;padding:8px;background:#263252}.datebox strong{display:block;font-size:18px}.datebox span{font-size:10px;color:var(--muted);text-transform:uppercase}.reminder h3{margin:0 0 5px;font-size:14px}.reminder p{margin:0;color:var(--muted);font-size:12px}
+.note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:15px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#e9fff9;color:#08251f;padding:13px 18px;border-radius:12px;font-weight:700;box-shadow:0 10px 30px #0005;display:none;z-index:5}
+.emailbox{display:flex;gap:8px;margin-top:12px}.emailbox input{flex:1;min-width:0}.smallbtn{padding:9px 12px;font-size:12px}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:25px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.stat{padding:16px}.stat-value{font-size:24px}}
+@media(max-width:480px){.wrap{padding:20px 13px 40px}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.sub{align-items:flex-start}.price{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">S</div><div><h1>SubSentry</h1><p class="subtitle">Your subscriptions. One clear view.</p></div></div>
+    <button onclick="document.getElementById('serviceName').focus();document.getElementById('addPanel').scrollIntoView({behavior:'smooth'})">＋ Add subscription</button>
+  </header>
+
+  <section class="stats">
+    <div class="stat"><div class="stat-label">Monthly spending</div><div class="stat-value" id="monthlyTotal">₹0</div><div class="stat-note">Estimated recurring cost per month</div></div>
+    <div class="stat"><div class="stat-label">Active subscriptions</div><div class="stat-value" id="activeCount">0</div><div class="stat-note">Services currently being tracked</div></div>
+    <div class="stat"><div class="stat-label">Next payment</div><div class="stat-value" id="nextPayment">—</div><div class="stat-note" id="nextService">Add a subscription to begin</div></div>
+  </section>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="section-head"><h2>Your subscriptions</h2><span class="badge" id="listCount">0 services</span></div>
+      <div class="list" id="subscriptionList"></div>
+      <p class="note">Tip: Enter the next renewal date from your streaming service account. SubSentry stores entries in this browser using local storage.</p>
+    </div>
+
+    <div style="display:grid;gap:18px;align-content:start">
+      <div class="panel">
+        <h2>Upcoming payments</h2>
+        <div id="upcomingList"></div>
+      </div>
+      <div class="panel" id="addPanel">
+        <h2>Add a subscription</h2>
+        <form id="subscriptionForm">
+          <div class="formgrid">
+            <div class="field full"><label for="serviceName">Service name</label><input id="serviceName" placeholder="e.g. Netflix, Spotify" required maxlength="50"></div>
+            <div class="field"><label for="cost">Payment amount (₹)</label><input id="cost" type="number" min="1" step="0.01" placeholder="149" required></div>
+            <div class="field"><label for="billing">Billing cycle</label><select id="billing"><option value="monthly">Monthly</option><option value="yearly">Yearly</option><option value="weekly">Weekly</option></select></div>
+            <div class="field"><label for="renewal">Next payment date</label><input id="renewal" type="date" required></div>
+            <div class="field"><label for="category">Category</label><select id="category"><option>Streaming</option><option>Music</option><option>Gaming</option><option>Software</option><option>Other</option></select></div>
+            <div class="field full"><label for="email">Email for reminder (optional)</label><input id="email" type="email" placeholder="you@example.com"></div>
+          </div>
+          <div class="form-actions"><button type="submit">Save subscription</button><button class="btn secondary" type="reset">Clear</button></div>
+        </form>
+        <p class="note">Email reminders: this demo prepares an email reminder using your device's email app. Automatic scheduled email delivery requires a secure backend/email service.</p>
+      </div>
+    </div>
+  </div>
+  <footer>SubSentry · Subscription tracking demo · Your data stays in this browser</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const STORAGE_KEY='subsentry_subscriptions_v1';
+let subscriptions=[];
+try{subscriptions=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');if(!Array.isArray(subscriptions))subscriptions=[];}catch(e){subscriptions=[];}
+const $=id=>document.getElementById(id);
+const money=n=>'₹'+Number(n).toLocaleString('en-IN',{maximumFractionDigits:2});
+const parseDate=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+const dayDiff=s=>{const now=new Date();now.setHours(0,0,0,0);return Math.round((parseDate(s)-now)/86400000);};
+const dateText=s=>parseDate(s).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+const iconFor=c=>({'Streaming':'🎬','Music':'🎧','Gaming':'🎮','Software':'💻','Other':'🔔'})[c]||'🔔';
+const cycleText=c=>({monthly:'month',yearly:'year',weekly:'week'})[c]||c;
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(subscriptions));render();}
+function showToast(msg){const t=$('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2600);}
+function monthlyEquivalent(s){const n=Number(s.cost)||0;return s.billing==='yearly'?n/12:s.billing==='weekly'?n*52/12:n;}
+function render(){
+ const total=subscriptions.reduce((a,s)=>a+monthlyEquivalent(s),0);
+ $('monthlyTotal').textContent=money(total);$('activeCount').textContent=subscriptions.length;$('listCount').textContent=`${subscriptions.length} service${subscriptions.length===1?'':'s'}`;
+ const sorted=[...subscriptions].sort((a,b)=>a.renewal.localeCompare(b.renewal));
+ const next=sorted[0];
+ $('nextPayment').textContent=next?money(next.cost):'—';
+ $('nextService').textContent=next?`${next.name} · ${dateText(next.renewal)}`:'Add a subscription to begin';
+ const list=$('subscriptionList');
+ if(!sorted.length){list.innerHTML='<div class="empty">No subscriptions yet. Add your first service to start tracking payments.</div>';}
+ else list.innerHTML=sorted.map(s=>{
+   const d=dayDiff(s.renewal),badge=d<0?`<span class="badge">Overdue</span>`:d===0?`<span class="badge today">Due today</span>`:d<=7?`<span class="badge soon">In ${d} day${d===1?'':'s'}</span>`:`<span class="badge">${d} days left</span>`;
+   return `<div class="sub"><div class="sub-left"><div class="service-icon">${iconFor(s.category)}</div><div><h3>${escapeHtml(s.name)}</h3><p>${escapeHtml(s.category)} · ${s.billing[0].toUpperCase()+s.billing.slice(1)} · ${dateText(s.renewal)}<br>${badge}</p></div></div><div class="price">${money(s.cost)}<small>per ${cycleText(s.billing)}</small><button class="smallbtn" style="margin-top:8px;background:#3a2440;color:#ffb5c2" onclick="removeSub('${s.id}')">Remove</button></div></div>`;
+ }).join('');
+ const up=$('upcomingList'),soon=sorted.filter(s=>dayDiff(s.renewal)>=0&&dayDiff(s.renewal)<=30);
+ if(!soon.length)up.innerHTML='<div class="empty">No payments due in the next 30 days.</div>';
+ else up.innerHTML=soon.map(s=>{const d=dayDiff(s.renewal),dt=parseDate(s.renewal);return `<div class="reminder"><div class="datebox"><strong>${dt.getDate()}</strong><span>${dt.toLocaleDateString('en-IN',{month:'short'})}</span></div><div><h3>${escapeHtml(s.name)} · ${money(s.cost)}</h3><p>${d===0?'Due today':`Due in ${d} day${d===1?'':'s'}`} · ${s.billing}</p>${s.email?`<button class="smallbtn" style="margin-top:8px" onclick="prepareEmail('${s.id}')">Prepare email reminder</button>`:''}</div></div>`}).join('');
+}
+function escapeHtml(str){return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function removeSub(id){subscriptions=subscriptions.filter(s=>s.id!==id);save();showToast('Subscription removed.');}
+$('subscriptionForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const name=$('serviceName').value.trim(),cost=Number($('cost').value),renewal=$('renewal').value,email=$('email').value.trim();
+ if(!name||!Number.isFinite(cost)||cost<=0||!renewal){showToast('Please enter valid subscription details.');return;}
+ if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Please enter a valid email address.');return;}
+ subscriptions.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),name,cost,billing:$('billing').value,renewal,category:$('category').value,email});
+ save();e.target.reset();showToast('Subscription saved!');$('subscriptionList').scrollIntoView({behavior:'smooth',block:'start'});
+});
+function prepareEmail(id){
+ const s=subscriptions.find(x=>x.id===id);if(!s)return;
+ const d=dayDiff(s.renewal),subject=encodeURIComponent(`Upcoming subscription payment: ${s.name}`);
+ const body=encodeURIComponent(`Hi,\n\nThis is a reminder that your ${s.name} subscription payment of ${money(s.cost)} is ${d===0?'due today':`due in ${d} day(s)`} on ${dateText(s.renewal)}.\n\nIf you no longer use this service, consider reviewing or cancelling it before renewal.\n\n— SubSentry`);
+ location.href=`mailto:${encodeURIComponent(s.email)}?subject=${subject}&body=${body}`;
+ showToast('Opening your email app to prepare the reminder.');
+}
+render();
+</script>
+</body>
+</html>
